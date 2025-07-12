@@ -1,14 +1,10 @@
-package com.github.gypsyjr777.service.llm
+package com.github.gypsyjr777.ai.service.llm
 
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.ollama.OllamaModel
 import dev.langchain4j.model.ollama.OllamaModels
 import dev.langchain4j.model.output.Response
-import jakarta.enterprise.context.ApplicationScoped
-import jakarta.inject.Named
 
-@ApplicationScoped
-@Named("ollamaService")
 class OllamaService : LlmService {
 //    @Inject
 //    lateinit var ollamaConfig: OllamaConfig

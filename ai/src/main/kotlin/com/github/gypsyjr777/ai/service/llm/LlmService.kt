@@ -1,4 +1,4 @@
-package com.github.gypsyjr777.service.llm
+package com.github.gypsyjr777.ai.service.llm
 
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.ollama.OllamaModel

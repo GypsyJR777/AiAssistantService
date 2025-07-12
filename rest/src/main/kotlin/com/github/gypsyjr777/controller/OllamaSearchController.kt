@@ -1,8 +1,9 @@
 package com.github.gypsyjr777.controller
 
+import com.github.gypsyjr777.ai.service.AssistantOllamaService
+import com.github.gypsyjr777.ai.service.llm.LlmService
+import com.github.gypsyjr777.ai.service.llm.OllamaService
 import com.github.gypsyjr777.config.OllamaConfig
-import com.github.gypsyjr777.service.AssistantOllamaService
-import com.github.gypsyjr777.service.llm.LlmService
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import jakarta.inject.Inject
@@ -19,11 +20,9 @@ class OllamaSearchController {
     @Inject
     lateinit var ollamaConfig: OllamaConfig
 
-    @Inject
-    lateinit var ollamaService: LlmService
+    var ollamaService: LlmService = OllamaService()
 
-    @Inject
-    lateinit var assistantOllama: AssistantOllamaService
+    var assistantOllama: AssistantOllamaService = AssistantOllamaService()
 
     @GET
     @Path("/test")

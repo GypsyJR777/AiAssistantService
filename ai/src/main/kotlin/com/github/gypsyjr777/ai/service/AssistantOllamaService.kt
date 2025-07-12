@@ -1,8 +1,8 @@
-package com.github.gypsyjr777.service
+package com.github.gypsyjr777.ai.service
 
-import com.github.gypsyjr777.service.llm.LlmService
-import com.github.gypsyjr777.service.llm.OllamaService
-import com.github.gypsyjr777.service.search.DDGSearchService
+import com.github.gypsyjr777.ai.service.llm.LlmService
+import com.github.gypsyjr777.ai.service.llm.OllamaService
+import com.github.gypsyjr777.ai.service.search.DDGSearchService
 import dev.langchain4j.memory.chat.ChatMemoryProvider
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.chat.response.ChatResponse
@@ -11,21 +11,14 @@ import dev.langchain4j.service.*
 import dev.langchain4j.web.search.WebSearchEngine
 import dev.langchain4j.web.search.WebSearchTool
 import dev.langchain4j.web.search.google.customsearch.GoogleCustomWebSearchEngine
-import jakarta.enterprise.context.ApplicationScoped
-import jakarta.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
-
-@ApplicationScoped
-@Named("assistantOllama")
 class AssistantOllamaService {
     interface Assistant {
         @SystemMessage(

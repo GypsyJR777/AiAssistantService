@@ -1,4 +1,4 @@
-package com.github.gypsyjr777.service.search
+package com.github.gypsyjr777.ai.service.search
 
 import dev.langchain4j.web.search.WebSearchInformationResult
 import dev.langchain4j.web.search.WebSearchOrganicResult

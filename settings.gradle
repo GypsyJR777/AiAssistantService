@@ -8,4 +8,7 @@ pluginManagement {
         id "${quarkusPluginId}" version "${quarkusPluginVersion}"
     }
 }
-rootProject.name = 'deepresearchservice'
+rootProject.name = 'aiassistant'
+
+include 'ai'
+include 'rest'
