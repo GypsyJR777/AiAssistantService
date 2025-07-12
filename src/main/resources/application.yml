@@ -2,10 +2,5 @@ quarkus:
   http:
     port: 8081
 ollama:
-  host: ${ollamaHost:}
-  port: ${ollamaPort:}
-
-"%dev":
-  ollama:
-    port: 7869
-    host: http://localhost
+  host: ${OLLAMA_HOST}
+  port: ${OLLAMA_PORT}
