@@ -1,13 +1,14 @@
 package com.github.gypsyjr777.ai.service.llm
 
-import dev.langchain4j.model.ollama.OllamaChatModel
-import dev.langchain4j.model.ollama.OllamaModel
+import com.github.gypsyjr777.ai.config.LlmConfig
+import dev.langchain4j.model.chat.StreamingChatModel
+import dev.langchain4j.service.TokenStream
+import java.util.UUID
 
 interface LlmService {
-    fun getModels(): List<OllamaModel>
-    fun createChat()
-    fun chat()
-    fun createChatModels()
-    fun getChatModel(model: String): OllamaChatModel?
-    fun getChatModels(): MutableMap<String, OllamaChatModel>
+    fun createStreamingChatModel(): StreamingChatModel
+
+    fun deleteChat(memoryId: UUID): TokenStream
+
+    fun createChatModels(config: LlmConfig)
 }

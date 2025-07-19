@@ -16,14 +16,12 @@ import java.net.URI
 import java.net.URISyntaxException
 
 class DDGSearchService(
-    private val httpClient: HttpClient = HttpClient(CIO)
+    private val httpClient: HttpClient = HttpClient(CIO),
 ) : WebSearchService {
     /**
      * Получение случайного User-Agent из списка.
      */
-    fun getRandomUserAgent(): String {
-        return COMMON_USER_AGENTS.random()
-    }
+    fun getRandomUserAgent(): String = COMMON_USER_AGENTS.random()
 
     /**
      * Выполняет поиск в DuckDuckGo, используя веб-скрейпинг.
@@ -43,10 +41,11 @@ class DDGSearchService(
 
         return try {
             runBlocking {
-                val response: HttpResponse = httpClient.get(BASE_URL) {
-                    parameter("q", query)
-                    header(HttpHeaders.UserAgent, getRandomUserAgent())
-                }
+                val response: HttpResponse =
+                    httpClient.get(BASE_URL) {
+                        parameter("q", query)
+                        header(HttpHeaders.UserAgent, getRandomUserAgent())
+                    }
 
                 if (!response.status.isSuccess()) {
                     System.err.println("Ошибка при запросе к DuckDuckGo: ${response.status}")
@@ -95,7 +94,6 @@ class DDGSearchService(
         }
     }
 
-
     companion object {
         private const val BASE_URL = "https://html.duckduckgo.com/html/"
         private const val RESULT_ITEM_SELECTOR = "div.web-result"
@@ -107,58 +105,53 @@ class DDGSearchService(
          * Использование разных агентов помогает имитировать запросы от различных пользователей
          * и снижает вероятность блокировки по причине "подозрительной активности робота".
          */
-        val COMMON_USER_AGENTS: List<String> = listOf(
-            // --- Windows ---
-            // Chrome on Windows 11
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-            // Edge on Windows 11
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.2535.67",
-            // Firefox on Windows 11
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
-            // Chrome on Windows 10
-            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            // Firefox on Windows 10
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
-
-            // --- macOS ---
-            // Chrome on macOS (Apple Silicon)
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-            // Safari on macOS (Apple Silicon)
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
-            // Firefox on macOS (Intel)
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:126.0) Gecko/20100101 Firefox/126.0",
-            // Chrome on macOS (Intel)
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            // Safari on macOS (Intel)
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
-
-
-            // --- Linux ---
-            // Chrome on Ubuntu
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-            // Firefox on Ubuntu
-            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:126.0) Gecko/20100101 Firefox/126.0",
-            // Generic Linux Chrome
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-
-            // --- Mobile: Android ---
-            // Chrome on Samsung Android
-            "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.113 Mobile Safari/537.36",
-            // Chrome on Google Pixel Android
-            "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36",
-            // Firefox on Android
-            "Mozilla/5.0 (Android 14; Mobile; rv:126.0) Gecko/126.0 Firefox/126.0",
-            // Samsung Browser
-            "Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/121.0.0.0 Mobile Safari/537.36",
-
-
-            // --- Mobile: iOS (iPhone & iPad) ---
-            // Safari on iPhone
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
-            // Safari on iPad
-            "Mozilla/5.0 (iPad; CPU OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
-            // Chrome on iPhone
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/125.0.6422.80 Mobile/15E148 Safari/604.1"
-        )
+        val COMMON_USER_AGENTS: List<String> =
+            listOf(
+                // --- Windows ---
+                // Chrome on Windows 11
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+                // Edge on Windows 11
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.2535.67",
+                // Firefox on Windows 11
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
+                // Chrome on Windows 10
+                "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                // Firefox on Windows 10
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
+                // --- macOS ---
+                // Chrome on macOS (Apple Silicon)
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+                // Safari on macOS (Apple Silicon)
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
+                // Firefox on macOS (Intel)
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:126.0) Gecko/20100101 Firefox/126.0",
+                // Chrome on macOS (Intel)
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                // Safari on macOS (Intel)
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
+                // --- Linux ---
+                // Chrome on Ubuntu
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+                // Firefox on Ubuntu
+                "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:126.0) Gecko/20100101 Firefox/126.0",
+                // Generic Linux Chrome
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                // --- Mobile: Android ---
+                // Chrome on Samsung Android
+                "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.113 Mobile Safari/537.36",
+                // Chrome on Google Pixel Android
+                "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36",
+                // Firefox on Android
+                "Mozilla/5.0 (Android 14; Mobile; rv:126.0) Gecko/126.0 Firefox/126.0",
+                // Samsung Browser
+                "Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/121.0.0.0 Mobile Safari/537.36",
+                // --- Mobile: iOS (iPhone & iPad) ---
+                // Safari on iPhone
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+                // Safari on iPad
+                "Mozilla/5.0 (iPad; CPU OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+                // Chrome on iPhone
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/125.0.6422.80 Mobile/15E148 Safari/604.1",
+            )
     }
 }

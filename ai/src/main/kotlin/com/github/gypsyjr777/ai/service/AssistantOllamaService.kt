@@ -27,62 +27,61 @@ class AssistantOllamaService {
             "If there is any event that has not happened yet",
             "You MUST create a web search request with user query and",
             "use the web search tool to search the web for organic web results.",
-            "Include the source link in your final response."
+            "Include the source link in your final response.",
         )
-        fun chat(@MemoryId memoryId: UUID, @UserMessage userMessage: String?): TokenStream
+        fun chat(
+            @MemoryId memoryId: UUID,
+            @UserMessage userMessage: String?,
+        ): TokenStream
     }
 
-    var ollamaService: LlmService = OllamaService()
-
-    var chatMemoryProvider: ChatMemoryProvider = ChatMemoryProvider { memoryId: Any? ->
-        MessageWindowChatMemory.builder()
-            .id(memoryId)
-            .maxMessages(10)
-            .build()
-    }
+    var chatMemoryProvider: ChatMemoryProvider =
+        ChatMemoryProvider { memoryId: Any? ->
+            MessageWindowChatMemory
+                .builder()
+                .id(memoryId)
+                .maxMessages(10)
+                .build()
+        }
     private val ddgSearchService: WebSearchEngine = DDGSearchService()
     private val assistants: MutableMap<String, Assistant> = mutableMapOf()
 
-    init {
-        ollamaService.getChatModels().forEach { (model, chatModel) ->
-            val assistant = AiServices.builder(Assistant::class.java)
-                .chatModel(chatModel)
-                .tools(WebSearchTool.from(ddgSearchService))
-                .chatMemoryProvider(chatMemoryProvider)
-                .build()
-
-            if (assistant != null) {
-                assistants[model] = assistant
-            }
-        }
-    }
-
-    fun chat(memoryId: UUID, userMessage: String, model: String): String? {
-        CoroutineScope(Dispatchers.IO).launch  {
-            val googleSearch = GoogleCustomWebSearchEngine.builder()
-                .apiKey("")
-                .csi("")
-                .maxRetries(2)
-                .build()
-            val assistant = AiServices.builder(AssistantDeepResearch::class.java)
-                .streamingChatModel(
-                    OllamaStreamingChatModel.builder()
-                        .baseUrl("http://localhost:7869")
-                        .temperature(0.8)
-                        .logRequests(true)
-                        .logResponses(true)
-                        .modelName("qwen3:8b")
-                        .timeout(Duration.ofMinutes(10))
-                        .build()
-                )
-                .tools(WebSearchTool.from(googleSearch))
-                .chatMemoryProvider(chatMemoryProvider)
-                .build()
+    fun chat(
+        memoryId: UUID,
+        userMessage: String,
+        model: String,
+    ): String? {
+        CoroutineScope(Dispatchers.IO).launch {
+            val googleSearch =
+                GoogleCustomWebSearchEngine
+                    .builder()
+                    .apiKey("")
+                    .csi("")
+                    .maxRetries(2)
+                    .build()
+            val assistant =
+                AiServices
+                    .builder(AssistantDeepResearch::class.java)
+                    .streamingChatModel(
+                        OllamaStreamingChatModel
+                            .builder()
+                            .baseUrl("http://localhost:7869")
+                            .temperature(0.8)
+                            .logRequests(true)
+                            .logResponses(true)
+                            .modelName("qwen3:8b")
+                            .timeout(Duration.ofMinutes(10))
+                            .build(),
+                    )
+                    .tools(WebSearchTool.from(googleSearch))
+                    .chatMemoryProvider(chatMemoryProvider)
+                    .build()
             val tokenStream: TokenStream = assistant.chat(memoryId, userMessage)
 
             val futureResponse = CompletableFuture<ChatResponse?>()
 
-            tokenStream.onPartialResponse(Consumer { s: String? -> print(s) })
+            tokenStream
+                .onPartialResponse(Consumer { s: String? -> print(s) })
                 .onCompleteResponse(Consumer { value: ChatResponse? -> futureResponse.complete(value) })
                 .onError(Consumer { ex: Throwable? -> futureResponse.completeExceptionally(ex) })
                 .start()
@@ -216,8 +215,11 @@ During your thinking phase, you should follow these guidelines:
 <output>
 Your report must be precise, of high-quality, and written by an expert using an unbiased and journalistic tone. Create a report following all of the above rules. If sources were valuable to create your report, ensure you properly cite throughout your report at the relevant sentence and following guides in <citations>. You MUST NEVER use lists. You MUST keep writing until you have written a 1,000 word report.
 </output>
-            """
+            """,
         )
-        fun chat(@MemoryId memoryId: UUID, @UserMessage userMessage: String?): TokenStream
+        fun chat(
+            @MemoryId memoryId: UUID,
+            @UserMessage userMessage: String?,
+        ): TokenStream
     }
 }
