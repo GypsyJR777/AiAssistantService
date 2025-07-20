@@ -6,7 +6,7 @@ import dev.langchain4j.service.TokenStream
 import dev.langchain4j.service.UserMessage
 import java.util.UUID
 
-interface BasicSearchAssistant {
+interface BasicSearchAssistant : Assistant {
     @SystemMessage(
         "You are a web search support agent.",
         "If there is any event that has not happened yet",
@@ -14,8 +14,8 @@ interface BasicSearchAssistant {
         "use the web search tool to search the web for organic web results.",
         "Include the source link in your final response.",
     )
-    fun chat(
+    override fun chat(
         @MemoryId memoryId: UUID,
-        @UserMessage userMessage: String?,
+        @UserMessage userMessage: String,
     ): TokenStream
 }

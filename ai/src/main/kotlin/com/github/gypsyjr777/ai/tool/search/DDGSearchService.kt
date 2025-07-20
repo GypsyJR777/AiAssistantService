@@ -1,5 +1,6 @@
-package com.github.gypsyjr777.ai.service.search
+package com.github.gypsyjr777.ai.tool.search
 
+import dev.langchain4j.web.search.WebSearchEngine
 import dev.langchain4j.web.search.WebSearchInformationResult
 import dev.langchain4j.web.search.WebSearchOrganicResult
 import dev.langchain4j.web.search.WebSearchRequest
@@ -17,7 +18,7 @@ import java.net.URISyntaxException
 
 class DDGSearchService(
     private val httpClient: HttpClient = HttpClient(CIO),
-) : WebSearchService {
+) : WebSearchEngine {
     /**
      * Получение случайного User-Agent из списка.
      */

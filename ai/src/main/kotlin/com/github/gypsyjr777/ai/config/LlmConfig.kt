@@ -6,5 +6,5 @@ data class LlmConfig(
     val logRequests: Boolean = false,
     val logResponse: Boolean = false,
     val modelName: String?,
-    val timeout: Long
+    val timeout: Long = 60
 )
