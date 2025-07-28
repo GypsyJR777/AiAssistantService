@@ -2,11 +2,18 @@ package com.github.gypsyjr777.ai.service
 
 import com.github.gypsyjr777.ai.assistant.Assistant
 import com.github.gypsyjr777.ai.assistant.PerplLikeSearchAssistant
+import com.github.gypsyjr777.ai.config.LlmConfig
+import com.github.gypsyjr777.ai.config.Platform
+import com.github.gypsyjr777.ai.exception.ConfigException
+import com.github.gypsyjr777.ai.tool.CustomTool
 import com.github.gypsyjr777.ai.tool.search.DDGSearchService
 import dev.langchain4j.memory.chat.ChatMemoryProvider
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.chat.response.ChatResponse
+import dev.langchain4j.model.ollama.OllamaModel
+import dev.langchain4j.model.ollama.OllamaModels
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel
+import dev.langchain4j.model.output.Response
 import dev.langchain4j.service.*
 import dev.langchain4j.web.search.WebSearchEngine
 import dev.langchain4j.web.search.WebSearchTool
@@ -20,7 +27,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 class AssistantOllamaService {
-    var chatMemoryProvider: ChatMemoryProvider =
+    private val chatMemoryProvider: ChatMemoryProvider =
         ChatMemoryProvider { memoryId: Any? ->
             MessageWindowChatMemory
                 .builder()
@@ -28,25 +35,17 @@ class AssistantOllamaService {
                 .maxMessages(10)
                 .build()
         }
-    private val ddgSearchService: WebSearchEngine = DDGSearchService()
     private val assistants: MutableMap<String, Assistant> = mutableMapOf()
 
     fun chat(
         memoryId: UUID,
         userMessage: String,
-        model: String,
-        partialAction: (test: String?) -> Unit,
+        assistantName: String,
+        partialAction: (text: String?) -> Unit,
         completeAction: (text: String?) -> Unit,
-        failAction: (text: Throwable?) -> Unit
+        failAction: (text: Throwable?) -> Unit,
     ): String? {
         CoroutineScope(Dispatchers.IO).launch {
-            val googleSearch =
-                GoogleCustomWebSearchEngine
-                    .builder()
-                    .apiKey("")
-                    .csi("")
-                    .maxRetries(2)
-                    .build()
             val assistant =
                 AiServices
                     .builder(PerplLikeSearchAssistant::class.java)
@@ -61,11 +60,10 @@ class AssistantOllamaService {
                             .timeout(Duration.ofMinutes(10))
                             .build(),
                     )
-                    .tools(WebSearchTool.from(googleSearch))
                     .chatMemoryProvider(chatMemoryProvider)
                     .build()
 
-            assistants[model] = assistant
+            assistants[assistantName] = assistant
             val tokenStream: TokenStream = assistant.chat(memoryId, userMessage)
 
             val futureResponse = CompletableFuture<ChatResponse>()
@@ -77,19 +75,58 @@ class AssistantOllamaService {
                         completeAction(value.aiMessage().text())
                         futureResponse.complete(value)
                     }
-                }
-                .onError { ex: Throwable ->
+                }.onError { ex: Throwable ->
                     {
                         failAction(ex)
                         futureResponse.completeExceptionally(ex)
                     }
-                }
-                .start()
+                }.start()
 
             val chatResponse = futureResponse.get(3000, TimeUnit.MINUTES)
             println("\n Result is: \n$chatResponse")
         }
 
         return ""
+    }
+
+    fun createAssistant(
+        name: String,
+        tools: List<CustomTool>,
+        llmConfig: LlmConfig,
+        assistantClass: Class<Any>
+    ) {
+        if (llmConfig.platform == Platform.OLLAMA) {
+            val ollamaModels: List<OllamaModel> = OllamaModels
+                .builder()
+                .baseUrl(llmConfig.address)
+                .build()
+                .availableModels()
+                .content()
+
+            val model = ollamaModels.find { it -> it.model == llmConfig.modelName }
+            if (model == null) {
+                throw ConfigException("Ollama model ${llmConfig.modelName} not found")
+            }
+
+            val assistant =
+                AiServices
+                    .builder(assistantClass)
+                    .streamingChatModel(
+                        OllamaStreamingChatModel
+                            .builder()
+                            .baseUrl(llmConfig.address)
+                            .temperature(llmConfig.temperature)
+                            .logRequests(llmConfig.logRequests)
+                            .logResponses(llmConfig.logResponse)
+                            .modelName(llmConfig.modelName)
+                            .timeout(Duration.ofSeconds(llmConfig.timeout))
+                            .build(),
+                    )
+                    .chatMemoryProvider(chatMemoryProvider)
+                    .tools(tools)
+                    .build()
+
+            assistants[name] = assistant
+        }
     }
 }
