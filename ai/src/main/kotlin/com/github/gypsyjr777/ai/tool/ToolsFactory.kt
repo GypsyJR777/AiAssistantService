@@ -21,8 +21,8 @@ class ToolsFactory(
         return tools
     }
 
-    private enum class ToolType (
-        val toolName: String
+    private enum class ToolType(
+        val toolName: String,
     ) {
         GOOGLE_SEARCH("google") {
             override fun createTool(config: AssistantConfig): CustomTool? {
@@ -39,8 +39,9 @@ class ToolsFactory(
                 }
                 return null
             }
-        };
-//        DDG_SEARCH("ddg", WebSearchTool::class.java),
+        }, ;
+
+        //        DDG_SEARCH("ddg", WebSearchTool::class.java),
 
         abstract fun createTool(config: AssistantConfig): CustomTool?
     }
