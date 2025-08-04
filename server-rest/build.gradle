@@ -27,6 +27,9 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.20.1'
 
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2")
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2'
+
     implementation project(":ai")
 }
 

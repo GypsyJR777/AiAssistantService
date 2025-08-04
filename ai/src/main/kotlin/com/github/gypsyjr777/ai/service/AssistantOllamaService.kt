@@ -69,7 +69,7 @@ class AssistantOllamaService {
         name: String,
         tools: List<CustomTool>,
         llmConfig: LlmConfig,
-        assistantClass: Class<Any>,
+        assistantClass: Class<*>,
     ) {
         if (llmConfig.platform == Platform.OLLAMA) {
             val ollamaModels: List<OllamaModel> =

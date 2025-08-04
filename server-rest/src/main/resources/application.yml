@@ -1,6 +1,9 @@
 quarkus:
   http:
     port: 8081
-ollama:
-  host: ${OLLAMA_HOST}
-  port: ${OLLAMA_PORT}
+
+assistant:
+  config:
+    path: ${ASSISTANT_PATH}
+  assistants:
+    - BasicSearchAssistant
