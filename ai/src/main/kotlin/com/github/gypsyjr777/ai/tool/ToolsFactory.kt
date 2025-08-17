@@ -1,15 +1,16 @@
 package com.github.gypsyjr777.ai.tool
 
 import com.github.gypsyjr777.ai.config.AssistantConfig
+import com.github.gypsyjr777.ai.exception.ToolException
 import com.github.gypsyjr777.ai.tool.search.WebSearchTool
 import dev.langchain4j.web.search.google.customsearch.GoogleCustomWebSearchEngine
 
 class ToolsFactory(
     private val assistantConfig: AssistantConfig,
 ) {
-    val toolsList: Map<String, CustomTool> = createToolsList()
+    val toolsList: MutableMap<String, CustomTool> = createToolsList()
 
-    private fun createToolsList(): Map<String, CustomTool> {
+    private fun createToolsList(): MutableMap<String, CustomTool> {
         val tools: MutableMap<String, CustomTool> = hashMapOf()
 
         assistantConfig.search.keys.forEach { name ->
@@ -44,5 +45,13 @@ class ToolsFactory(
         //        DDG_SEARCH("ddg", WebSearchTool::class.java),
 
         abstract fun createTool(config: AssistantConfig): CustomTool?
+    }
+
+    fun addCustomTool(toolName: String, tool: CustomTool) {
+        if (toolsList.containsKey(toolName)) {
+            throw ToolException("Tool with name $toolName already exists")
+        }
+
+        toolsList[toolName] = tool
     }
 }

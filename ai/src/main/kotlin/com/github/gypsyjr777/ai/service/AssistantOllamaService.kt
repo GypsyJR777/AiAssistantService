@@ -21,7 +21,7 @@ import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
-class AssistantOllamaService {
+class AssistantOllamaService(
     private val chatMemoryProvider: ChatMemoryProvider =
         ChatMemoryProvider { memoryId: Any? ->
             MessageWindowChatMemory
@@ -30,7 +30,9 @@ class AssistantOllamaService {
                 .maxMessages(10)
                 .build()
         }
-    private val assistants: MutableMap<String, Assistant> = mutableMapOf()
+) {
+
+    private val assistants: MutableMap<String, Assistant> = hashMapOf()
 
     fun chat(
         memoryId: UUID,
