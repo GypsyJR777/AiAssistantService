@@ -30,6 +30,9 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2")
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2'
 
+    // telegram bot - will be remove to another module
+    implementation("io.github.dehuckakpyt.telegrambot:telegram-bot-core:$telegram_bot_version")
+
     implementation project(":ai")
 }
 

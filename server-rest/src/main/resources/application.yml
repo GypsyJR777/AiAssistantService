@@ -7,3 +7,8 @@ assistant:
     path: ${ASSISTANT_PATH}
   assistants:
     - BasicSearchAssistant
+
+bot:
+  telegram:
+    token: ${TELEGRAM_TOKEN:}
+    name: ${TELEGRAM_BOT_NAME:}

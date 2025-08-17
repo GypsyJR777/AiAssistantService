@@ -1,4 +1,4 @@
-package com.github.gypsyjr777.config
+package com.github.gypsyjr777.bean
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
@@ -8,6 +8,7 @@ import com.github.gypsyjr777.ai.exception.ConfigException
 import com.github.gypsyjr777.ai.service.AssistantOllamaService
 import com.github.gypsyjr777.ai.tool.CustomTool
 import com.github.gypsyjr777.ai.tool.ToolsFactory
+import com.github.gypsyjr777.config.AssistantToolConfig
 import io.quarkus.arc.DefaultBean
 import jakarta.enterprise.context.Dependent
 import jakarta.enterprise.inject.Produces
@@ -16,7 +17,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 @Dependent
-class AssistantConfigBean {
+class AssistantBean {
     @Produces
     @DefaultBean
     fun getAssistantOllamaService(

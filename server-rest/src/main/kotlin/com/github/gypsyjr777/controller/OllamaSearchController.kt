@@ -10,6 +10,5 @@ class OllamaSearchController(
 ) {
     @GET()
     fun index() {
-
     }
 }

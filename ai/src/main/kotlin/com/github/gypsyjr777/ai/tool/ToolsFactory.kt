@@ -47,7 +47,10 @@ class ToolsFactory(
         abstract fun createTool(config: AssistantConfig): CustomTool?
     }
 
-    fun addCustomTool(toolName: String, tool: CustomTool) {
+    fun addCustomTool(
+        toolName: String,
+        tool: CustomTool,
+    ) {
         if (toolsList.containsKey(toolName)) {
             throw ToolException("Tool with name $toolName already exists")
         }
