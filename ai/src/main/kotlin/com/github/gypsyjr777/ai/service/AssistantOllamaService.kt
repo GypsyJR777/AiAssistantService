@@ -21,7 +21,7 @@ import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
-class AssistantOllamaService {
+class AssistantOllamaService : LLMService {
     private val chatMemoryProvider: ChatMemoryProvider =
         ChatMemoryProvider { memoryId: Any? ->
             MessageWindowChatMemory
@@ -33,7 +33,7 @@ class AssistantOllamaService {
 
     private val assistants: MutableMap<String, Assistant> = hashMapOf()
 
-    fun chat(
+    override fun chat(
         memoryId: UUID,
         userMessage: String,
         assistantName: String,
@@ -54,13 +54,13 @@ class AssistantOllamaService {
                 .onPartialResponse { s: String -> partialAction(s) }
                 .onCompleteResponse { value: ChatResponse ->
                     {
-                        completeAction(value.aiMessage().text())
-                        futureResponse.complete(value)
+                        if (futureResponse.complete(value))
+                            completeAction(value.aiMessage().text())
                     }
                 }.onError { ex: Throwable ->
                     {
-                        failAction(ex)
                         futureResponse.completeExceptionally(ex)
+                        failAction(ex)
                     }
                 }.start()
         }

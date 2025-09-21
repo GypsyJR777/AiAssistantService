@@ -28,7 +28,7 @@ class AssistantBean {
         assistantConfig.llm.forEach { name, config ->
             config.assistants.forEach { assistant ->
                 assistantOllamaService.createAssistant(
-                    assistant,
+                    assistant + config.modelName,
                     tools.values.toList(),
                     config,
                     Class.forName(assistant),
