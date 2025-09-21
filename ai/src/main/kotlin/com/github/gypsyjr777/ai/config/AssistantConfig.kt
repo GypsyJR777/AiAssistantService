@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AssistantConfig(
     val llm: Map<String, LlmConfig>,
-    val search: Map<String, SearchConfig>,
+    val search: Map<String, SearchConfig>?,
 )

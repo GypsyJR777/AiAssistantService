@@ -7,7 +7,4 @@ import io.smallrye.config.WithName
 interface AssistantToolConfig {
     @WithName("config.path")
     fun path(): String?
-
-    @WithName("assistants")
-    fun assistants(): List<String>
 }

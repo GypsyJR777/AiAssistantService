@@ -5,8 +5,6 @@ quarkus:
 assistant:
   config:
     path: ${ASSISTANT_PATH}
-  assistants:
-    - BasicSearchAssistant
 
 bot:
   telegram:

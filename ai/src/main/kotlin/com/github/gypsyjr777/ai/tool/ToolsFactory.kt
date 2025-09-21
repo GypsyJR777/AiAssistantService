@@ -13,9 +13,11 @@ class ToolsFactory(
     private fun createToolsList(): MutableMap<String, CustomTool> {
         val tools: MutableMap<String, CustomTool> = hashMapOf()
 
-        assistantConfig.search.keys.forEach { name ->
-            if (name == ToolType.GOOGLE_SEARCH.toolName) {
-                ToolType.GOOGLE_SEARCH.createTool(assistantConfig)?.let { tools.put(name, it) }
+        if (!assistantConfig.search.isNullOrEmpty()) {
+            assistantConfig.search.keys.forEach { name ->
+                if (name == ToolType.GOOGLE_SEARCH.toolName) {
+                    ToolType.GOOGLE_SEARCH.createTool(assistantConfig)?.let { tools.put(name, it) }
+                }
             }
         }
 
@@ -27,16 +29,20 @@ class ToolsFactory(
     ) {
         GOOGLE_SEARCH("google") {
             override fun createTool(config: AssistantConfig): CustomTool? {
-                if (config.search.containsKey(toolName)) {
-                    val googleSearch =
-                        GoogleCustomWebSearchEngine
-                            .builder()
-                            .apiKey(config.search[toolName]!!.apiKey)
-                            .csi(config.search[toolName]!!.csi)
-                            .maxRetries(2)
-                            .build()
+                if (config.search!!.containsKey(toolName)) {
+                    try {
+                        val googleSearch =
+                            GoogleCustomWebSearchEngine
+                                .builder()
+                                .apiKey(config.search[toolName]!!.apiKey)
+                                .csi(config.search[toolName]!!.csi)
+                                .maxRetries(2)
+                                .build()
 
-                    return WebSearchTool(googleSearch)
+                        return WebSearchTool(googleSearch)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
                 return null
             }

@@ -22,17 +22,18 @@ class AssistantBean {
     @DefaultBean
     fun getAssistantOllamaService(
         tools: Map<String, CustomTool>,
-        assistantToolConfig: AssistantToolConfig,
         assistantConfig: AssistantConfig,
     ): AssistantOllamaService {
         val assistantOllamaService = AssistantOllamaService()
-        assistantToolConfig.assistants().forEach { assistant ->
-            assistantOllamaService.createAssistant(
-                assistant,
-                tools.values.toList(),
-                assistantConfig.llm[assistant]!!,
-                Class.forName(assistant),
-            )
+        assistantConfig.llm.forEach { name, config ->
+            config.assistants.forEach { assistant ->
+                assistantOllamaService.createAssistant(
+                    assistant,
+                    tools.values.toList(),
+                    config,
+                    Class.forName(assistant),
+                )
+            }
         }
 
         return assistantOllamaService
