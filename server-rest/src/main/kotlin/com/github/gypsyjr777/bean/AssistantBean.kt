@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.gypsyjr777.ai.config.AssistantConfig
 import com.github.gypsyjr777.ai.exception.ConfigException
 import com.github.gypsyjr777.ai.service.AssistantOllamaService
+import com.github.gypsyjr777.ai.service.AssistantOpenAIService
 import com.github.gypsyjr777.ai.tool.CustomTool
 import com.github.gypsyjr777.ai.tool.ToolsFactory
 import com.github.gypsyjr777.config.AssistantToolConfig
@@ -37,6 +38,28 @@ class AssistantBean {
         }
 
         return assistantOllamaService
+    }
+
+    @Produces
+    @DefaultBean
+    fun getAssistantOpenAIService(
+        tools: Map<String, CustomTool>,
+        assistantConfig: AssistantConfig,
+    ): AssistantOpenAIService {
+        val assistantOpenAIService = AssistantOpenAIService()
+
+        assistantConfig.llm.forEach { name, config ->
+            config.assistants.forEach { assistant ->
+                assistantOpenAIService.createAssistant(
+                    assistant + config.modelName,
+                    tools.values.toList(),
+                    config,
+                    Class.forName(assistant),
+                )
+            }
+        }
+
+        return assistantOpenAIService
     }
 
     @Produces

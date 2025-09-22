@@ -3,25 +3,17 @@ package com.github.gypsyjr777.ai.service
 import com.github.gypsyjr777.ai.assistant.Assistant
 import com.github.gypsyjr777.ai.config.LlmConfig
 import com.github.gypsyjr777.ai.config.Platform
-import com.github.gypsyjr777.ai.exception.AssistantNotFoundException
 import com.github.gypsyjr777.ai.exception.ConfigException
 import com.github.gypsyjr777.ai.tool.CustomTool
 import dev.langchain4j.memory.chat.ChatMemoryProvider
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
-import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.model.ollama.OllamaModel
 import dev.langchain4j.model.ollama.OllamaModels
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel
 import dev.langchain4j.service.AiServices
-import dev.langchain4j.service.TokenStream
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.time.Duration
-import java.util.UUID
-import java.util.concurrent.CompletableFuture
 
-class AssistantOllamaService : LLMService {
+class AssistantOllamaService : LLMService() {
     private val chatMemoryProvider: ChatMemoryProvider =
         ChatMemoryProvider { memoryId: Any? ->
             MessageWindowChatMemory
@@ -31,39 +23,7 @@ class AssistantOllamaService : LLMService {
                 .build()
         }
 
-    private val assistants: MutableMap<String, Assistant> = hashMapOf()
-
-    override fun chat(
-        memoryId: UUID,
-        userMessage: String,
-        assistantName: String,
-        partialAction: (text: String?) -> Unit,
-        completeAction: (text: String?) -> Unit,
-        failAction: (text: Throwable?) -> Unit,
-    ) {
-        if (!assistants.containsKey(assistantName)) {
-            throw AssistantNotFoundException("$assistantName not found")
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val assistant = assistants[assistantName]
-            val tokenStream: TokenStream = assistant!!.chat(memoryId, userMessage)
-            val futureResponse = CompletableFuture<ChatResponse>()
-
-            tokenStream
-                .onPartialResponse { s: String -> partialAction(s) }
-                .onCompleteResponse { value: ChatResponse? -> futureResponse.complete(value) }
-                .onError { ex: Throwable ->
-                    {
-                        futureResponse.completeExceptionally(ex)
-                    }
-                }.start()
-
-            completeAction(futureResponse.get().aiMessage().text())
-        }
-    }
-
-    fun createAssistant(
+    override fun createAssistant(
         name: String,
         tools: List<CustomTool>,
         llmConfig: LlmConfig,

@@ -11,5 +11,6 @@ data class LlmConfig(
     val logResponse: Boolean = false,
     val modelName: String,
     val timeout: Long = 60,
-    val assistants: List<String> = listOf("com.github.gypsyjr777.ai.assistant.BasicSearchAssistant")
+    val assistants: List<String> = listOf("com.github.gypsyjr777.ai.assistant.BasicSearchAssistant"),
+    val apiKey: String? = null,
 )
