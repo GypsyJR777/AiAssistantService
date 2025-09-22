@@ -6,7 +6,6 @@ import io.github.dehuckakpyt.telegrambot.handling.BotHandling
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 fun BotHandling.startCommand() {
@@ -26,27 +25,42 @@ fun BotHandling.chatCommand(assistantOllamaService: AssistantOllamaService) {
             messageText!!,
             "com.github.gypsyjr777.ai.assistant.BasicSearchAssistantqwen3:8b",
             { part ->
-                runBlocking {
-                    messageThinkingText += part
-                    val msg = message.text + messageThinkingText
-                    message = if (msg.length > 4096) {
-                        messageThinkingText = ""
-                        bot.sendMessage(chatId, msg)
-                    } else if (messageThinkingText.length > 15) {
-                        messageThinkingText = ""
-                        bot.editMessageText(
-                            chatId,
-                            message.messageId,
-                            msg,
-                        )
-                    } else message
-                }
+//                runBlocking {
+//                    messageThinkingText += part
+//                    val msg = message.text + messageThinkingText
+//                    message = if (msg.length > 4096) {
+//                        messageThinkingText = ""
+//                        bot.sendMessage(chatId, msg)
+//                    } else {
+//                        try {
+//                            bot.editMessageText(
+//                                chatId,
+//                                message.messageId,
+//                                msg,
+//                            ).also { messageThinkingText = "" }
+//                        } catch (e: Exception) {
+//                            print(e)
+//                            message
+//                        }
+//                    }
+//                }
             },
-            { message ->
+            { aiText ->
                 CoroutineScope(Dispatchers.IO).launch {
-                    bot.sendMessage(
-                        chatId, message!!
-                    )
+                    if (aiText!!.contains("<think>")) {
+                        val thinking = aiText.substringAfter("<think>").substringBefore("</think>").trim()
+                        bot.editMessageText(
+                            chatId, message.messageId, message.text + "\n" + thinking
+                        )
+                        bot.sendMessage(
+                            chatId,
+                            aiText.substringAfter("</think>").trim()
+                        )
+                    } else {
+                        bot.sendMessage(
+                            chatId, aiText
+                        )
+                    }
                 }
             }, { fail ->
                 CoroutineScope(Dispatchers.IO).launch {

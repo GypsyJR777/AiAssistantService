@@ -52,17 +52,14 @@ class AssistantOllamaService : LLMService {
 
             tokenStream
                 .onPartialResponse { s: String -> partialAction(s) }
-                .onCompleteResponse { value: ChatResponse ->
-                    {
-                        if (futureResponse.complete(value))
-                            completeAction(value.aiMessage().text())
-                    }
-                }.onError { ex: Throwable ->
+                .onCompleteResponse { value: ChatResponse? -> futureResponse.complete(value) }
+                .onError { ex: Throwable ->
                     {
                         futureResponse.completeExceptionally(ex)
-                        failAction(ex)
                     }
                 }.start()
+
+            completeAction(futureResponse.get().aiMessage().text())
         }
     }
 
