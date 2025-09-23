@@ -4,7 +4,6 @@ import com.github.gypsyjr777.ai.assistant.Assistant
 import com.github.gypsyjr777.ai.config.LlmConfig
 import com.github.gypsyjr777.ai.config.Platform
 import com.github.gypsyjr777.ai.exception.ConfigException
-import com.github.gypsyjr777.ai.tool.CustomTool
 import dev.langchain4j.memory.chat.ChatMemoryProvider
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.ollama.OllamaModel
@@ -25,7 +24,7 @@ class AssistantOllamaService : LLMService() {
 
     override fun createAssistant(
         name: String,
-        tools: List<CustomTool>,
+        tools: List<Any>,
         llmConfig: LlmConfig,
         assistantClass: Class<*>,
     ) {

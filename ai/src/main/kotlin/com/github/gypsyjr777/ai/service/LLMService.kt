@@ -3,7 +3,6 @@ package com.github.gypsyjr777.ai.service
 import com.github.gypsyjr777.ai.assistant.Assistant
 import com.github.gypsyjr777.ai.config.LlmConfig
 import com.github.gypsyjr777.ai.exception.AssistantNotFoundException
-import com.github.gypsyjr777.ai.tool.CustomTool
 import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.service.TokenStream
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +14,11 @@ import java.util.concurrent.CompletableFuture
 abstract class LLMService {
     val assistants: MutableMap<String, Assistant> = hashMapOf()
 
-     fun chat(
+    fun hasAssistant(assistantName: String): Boolean {
+        return assistants.containsKey(assistantName)
+    }
+
+    fun chat(
         memoryId: UUID,
         userMessage: String,
         assistantName: String,
@@ -45,16 +48,16 @@ abstract class LLMService {
                 if (error != null) {
                     failAction(error)
                 }
-                    if (result != null) {
-                        completeAction(result.aiMessage().text())
-                    }
+                if (result != null) {
+                    completeAction(result.aiMessage().text())
+                }
             }
         }
     }
 
     abstract fun createAssistant(
         name: String,
-        tools: List<CustomTool>,
+        tools: List<Any>,
         llmConfig: LlmConfig,
         assistantClass: Class<*>,
     )

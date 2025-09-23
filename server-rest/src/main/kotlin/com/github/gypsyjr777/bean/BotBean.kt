@@ -1,6 +1,6 @@
 package com.github.gypsyjr777.bean
 
-import com.github.gypsyjr777.ai.service.AssistantOllamaService
+import com.github.gypsyjr777.ai.service.LLMService
 import com.github.gypsyjr777.bot.tg.command.chatCommand
 import com.github.gypsyjr777.bot.tg.command.startCommand
 import com.github.gypsyjr777.config.BotConfig
@@ -21,7 +21,7 @@ class BotBean {
 
     @Produces
     @DefaultBean
-    fun getTelegramBotContext(botConfig: BotConfig, assistantOllamaService: AssistantOllamaService): TelegramBotContext? {
+    fun getTelegramBotContext(botConfig: BotConfig, llmServices: List<LLMService>): TelegramBotContext? {
         if (botConfig.getBot() == null) {
             return null
         }
@@ -35,7 +35,7 @@ class BotBean {
                     receiving {
                         handling {
                             startCommand()
-                            chatCommand(assistantOllamaService)
+                            chatCommand(llmServices)
                         }
                     }
                 }

@@ -2,16 +2,16 @@ package com.github.gypsyjr777.ai.tool
 
 import com.github.gypsyjr777.ai.config.AssistantConfig
 import com.github.gypsyjr777.ai.exception.ToolException
-import com.github.gypsyjr777.ai.tool.search.WebSearchTool
+import dev.langchain4j.web.search.WebSearchTool
 import dev.langchain4j.web.search.google.customsearch.GoogleCustomWebSearchEngine
 
 class ToolsFactory(
     private val assistantConfig: AssistantConfig,
 ) {
-    val toolsList: MutableMap<String, CustomTool> = createToolsList()
+    val toolsList: MutableMap<String, Any> = createToolsList()
 
-    private fun createToolsList(): MutableMap<String, CustomTool> {
-        val tools: MutableMap<String, CustomTool> = hashMapOf()
+    private fun createToolsList(): MutableMap<String, Any> {
+        val tools: MutableMap<String, Any> = hashMapOf()
 
         if (!assistantConfig.search.isNullOrEmpty()) {
             assistantConfig.search.keys.forEach { name ->
@@ -28,7 +28,7 @@ class ToolsFactory(
         val toolName: String,
     ) {
         GOOGLE_SEARCH("google") {
-            override fun createTool(config: AssistantConfig): CustomTool? {
+            override fun createTool(config: AssistantConfig): Any? {
                 if (config.search!!.containsKey(toolName)) {
                     try {
                         val googleSearch =
@@ -37,6 +37,8 @@ class ToolsFactory(
                                 .apiKey(config.search[toolName]!!.apiKey)
                                 .csi(config.search[toolName]!!.csi)
                                 .maxRetries(2)
+                                .logRequests(true)
+                                .logResponses(true)
                                 .build()
 
                         return WebSearchTool(googleSearch)
@@ -50,12 +52,12 @@ class ToolsFactory(
 
         //        DDG_SEARCH("ddg", WebSearchTool::class.java),
 
-        abstract fun createTool(config: AssistantConfig): CustomTool?
+        abstract fun createTool(config: AssistantConfig): Any?
     }
 
     fun addCustomTool(
         toolName: String,
-        tool: CustomTool,
+        tool: Any,
     ) {
         if (toolsList.containsKey(toolName)) {
             throw ToolException("Tool with name $toolName already exists")

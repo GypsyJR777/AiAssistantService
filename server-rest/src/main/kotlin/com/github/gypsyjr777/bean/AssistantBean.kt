@@ -7,7 +7,7 @@ import com.github.gypsyjr777.ai.config.AssistantConfig
 import com.github.gypsyjr777.ai.exception.ConfigException
 import com.github.gypsyjr777.ai.service.AssistantOllamaService
 import com.github.gypsyjr777.ai.service.AssistantOpenAIService
-import com.github.gypsyjr777.ai.tool.CustomTool
+import com.github.gypsyjr777.ai.service.LLMService
 import com.github.gypsyjr777.ai.tool.ToolsFactory
 import com.github.gypsyjr777.config.AssistantToolConfig
 import io.quarkus.arc.DefaultBean
@@ -21,8 +21,22 @@ import kotlin.io.path.exists
 class AssistantBean {
     @Produces
     @DefaultBean
+    fun getLLMServices(
+        ollamaService: AssistantOllamaService,
+        openAIService: AssistantOpenAIService,
+    ): List<LLMService> {
+        val llmServices: MutableList<LLMService> = mutableListOf()
+
+        llmServices.add(ollamaService)
+        llmServices.add(openAIService)
+
+        return llmServices
+    }
+
+    @Produces
+    @DefaultBean
     fun getAssistantOllamaService(
-        tools: Map<String, CustomTool>,
+        tools: Map<String, Any>,
         assistantConfig: AssistantConfig,
     ): AssistantOllamaService {
         val assistantOllamaService = AssistantOllamaService()
@@ -43,7 +57,7 @@ class AssistantBean {
     @Produces
     @DefaultBean
     fun getAssistantOpenAIService(
-        tools: Map<String, CustomTool>,
+        tools: Map<String, Any>,
         assistantConfig: AssistantConfig,
     ): AssistantOpenAIService {
         val assistantOpenAIService = AssistantOpenAIService()
@@ -64,7 +78,7 @@ class AssistantBean {
 
     @Produces
     @DefaultBean
-    fun getTools(assistantConfig: AssistantConfig): Map<String, CustomTool> = ToolsFactory(assistantConfig).toolsList
+    fun getTools(assistantConfig: AssistantConfig): Map<String, Any> = ToolsFactory(assistantConfig).toolsList
 
     @Produces
     @DefaultBean
