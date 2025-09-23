@@ -1,0 +1,107 @@
+package com.github.gypsyjr777.bean
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.github.gypsyjr777.ai.config.AssistantConfig
+import com.github.gypsyjr777.ai.exception.ConfigException
+import com.github.gypsyjr777.ai.service.AssistantOllamaService
+import com.github.gypsyjr777.ai.service.AssistantOpenAIService
+import com.github.gypsyjr777.ai.service.LLMService
+import com.github.gypsyjr777.ai.tool.ToolsFactory
+import com.github.gypsyjr777.config.AssistantToolConfig
+import io.quarkus.arc.DefaultBean
+import jakarta.enterprise.context.Dependent
+import jakarta.enterprise.inject.Produces
+import java.nio.file.Files
+import kotlin.io.path.Path
+import kotlin.io.path.exists
+
+@Dependent
+class AssistantBean {
+    @Produces
+    @DefaultBean
+    fun getLLMServices(
+        ollamaService: AssistantOllamaService,
+        openAIService: AssistantOpenAIService,
+    ): List<LLMService> {
+        val llmServices: MutableList<LLMService> = mutableListOf()
+
+        llmServices.add(ollamaService)
+        llmServices.add(openAIService)
+
+        return llmServices
+    }
+
+    @Produces
+    @DefaultBean
+    fun getAssistantOllamaService(
+        tools: Map<String, Any>,
+        assistantConfig: AssistantConfig,
+    ): AssistantOllamaService {
+        val assistantOllamaService = AssistantOllamaService()
+        assistantConfig.llm.forEach { name, config ->
+            config.assistants.forEach { assistant ->
+                assistantOllamaService.createAssistant(
+                    assistant + config.modelName,
+                    tools.values.toList(),
+                    config,
+                    Class.forName(assistant),
+                )
+            }
+        }
+
+        return assistantOllamaService
+    }
+
+    @Produces
+    @DefaultBean
+    fun getAssistantOpenAIService(
+        tools: Map<String, Any>,
+        assistantConfig: AssistantConfig,
+    ): AssistantOpenAIService {
+        val assistantOpenAIService = AssistantOpenAIService()
+
+        assistantConfig.llm.forEach { name, config ->
+            config.assistants.forEach { assistant ->
+                assistantOpenAIService.createAssistant(
+                    assistant + config.modelName,
+                    tools.values.toList(),
+                    config,
+                    Class.forName(assistant),
+                )
+            }
+        }
+
+        return assistantOpenAIService
+    }
+
+    @Produces
+    @DefaultBean
+    fun getTools(assistantConfig: AssistantConfig): Map<String, Any> = ToolsFactory(assistantConfig).toolsList
+
+    @Produces
+    @DefaultBean
+    fun getAssistantConfig(assistantToolConfig: AssistantToolConfig): AssistantConfig {
+        if (assistantToolConfig.path() != null) {
+            return createFromPath(assistantToolConfig.path()!!)
+        }
+
+        throw ConfigException("Assistant config not found")
+    }
+
+    private fun createFromPath(path: String): AssistantConfig {
+        if (Path(path).exists()) {
+            val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
+            return try {
+                Files.newBufferedReader(Path(path)).use {
+                    mapper.readValue(it, AssistantConfig::class.java)
+                }
+            } catch (exception: Exception) {
+                throw ConfigException("Unable to read config file: $path", exception)
+            }
+        }
+
+        throw ConfigException("Path $path does not exists")
+    }
+}

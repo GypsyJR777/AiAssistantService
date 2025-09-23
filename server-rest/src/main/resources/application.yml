@@ -1,0 +1,12 @@
+quarkus:
+  http:
+    port: 8081
+
+assistant:
+  config:
+    path: ${ASSISTANT_PATH}
+
+bot:
+  telegram:
+    token: ${TELEGRAM_TOKEN:}
+    name: ${TELEGRAM_BOT_NAME:}
