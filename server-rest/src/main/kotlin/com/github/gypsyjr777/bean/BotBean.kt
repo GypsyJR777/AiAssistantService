@@ -2,6 +2,7 @@ package com.github.gypsyjr777.bean
 
 import com.github.gypsyjr777.ai.service.LLMService
 import com.github.gypsyjr777.bot.tg.command.chatCommand
+import com.github.gypsyjr777.bot.tg.command.helpCommand
 import com.github.gypsyjr777.bot.tg.command.startCommand
 import com.github.gypsyjr777.config.BotConfig
 import io.github.dehuckakpyt.telegrambot.config.TelegramBotConfig
@@ -36,6 +37,7 @@ class BotBean {
                         handling {
                             startCommand()
                             chatCommand(llmServices)
+                            helpCommand()
                         }
                     }
                 }

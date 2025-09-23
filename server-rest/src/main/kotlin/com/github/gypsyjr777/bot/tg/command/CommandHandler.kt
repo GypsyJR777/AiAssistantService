@@ -14,6 +14,12 @@ fun BotHandling.startCommand() {
     }
 }
 
+fun BotHandling.helpCommand() {
+    command("/help") {
+        bot.sendMessage(chatId, buildHelpMessage(bot.username))
+    }
+}
+
 fun BotHandling.chatCommand(lLMServices: List<LLMService>) {
     command("/chat") {
         val messageText = message.text
@@ -97,17 +103,65 @@ fun BotHandling.chatCommand(lLMServices: List<LLMService>) {
 
 val idForChats: MutableMap<Long, UUID> = hashMapOf()
 
-private fun splitMessage(message: String): List<String> {
-    val messages: MutableList<String> = ArrayList()
+private const val TELEGRAM_MESSAGE_LIMIT = 4096
 
-    val splitMsg = message.split("\n")
-    for (msg in splitMsg) {
-        if (messages.isNotEmpty() && messages[messages.size - 1].length + msg.length > 4096) {
-            messages.add(msg)
-        } else {
-            messages[messages.size - 1] = messages[messages.size - 1] + "\n" + msg
+internal fun splitMessage(
+    message: String,
+    limit: Int = TELEGRAM_MESSAGE_LIMIT,
+): List<String> {
+    if (message.isEmpty()) {
+        return emptyList()
+    }
+    val messages: MutableList<String> = ArrayList()
+    val current = StringBuilder()
+
+    fun flush() {
+        if (current.isNotEmpty()) {
+            messages.add(current.toString())
+            current.setLength(0)
         }
+    }
+
+    message.forEach { char ->
+        if (current.length == limit) {
+            flush()
+        }
+
+        if (char == '\n') {
+            if (current.length + 1 > limit) {
+                flush()
+            }
+
+            current.append(char)
+            flush()
+        } else {
+            if (current.length + 1 > limit) {
+                flush()
+            }
+
+            current.append(char)
+        }
+    }
+
+    if (current.isNotEmpty()) {
+        messages.add(current.toString())
     }
 
     return messages
 }
+
+internal fun buildHelpMessage(botName: String): String =
+    """
+        Привет! Я $botName — ИИ-ассистент для глубоких исследований и общения с подключенными LLM.
+
+        Что я умею:
+        • выполнять детальные исследования и собирать ответы с учетом контекста чата;
+        • делиться промежуточными рассуждениями (think) и разбивать длинные ответы на части;
+        • помнить историю переписки в рамках чата, чтобы продолжать диалог.
+
+        Команды:
+        • /start — короткое приветствие и проверка, что бот активен.
+        • /help — показать это описание возможностей.
+        • /chat <запрос> — отправьте команду с вопросом или уточнением, и я подготовлю развёрнутый ответ, сохранив контекст.
+    """
+        .trimIndent()
