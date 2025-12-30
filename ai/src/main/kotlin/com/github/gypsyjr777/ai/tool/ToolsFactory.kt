@@ -1,6 +1,7 @@
 package com.github.gypsyjr777.ai.tool
 
 import com.github.gypsyjr777.ai.config.AssistantConfig
+import com.github.gypsyjr777.ai.config.SearchConfig
 import com.github.gypsyjr777.ai.exception.ToolException
 import dev.langchain4j.web.search.WebSearchTool
 import dev.langchain4j.web.search.google.customsearch.GoogleCustomWebSearchEngine
@@ -13,8 +14,8 @@ class ToolsFactory(
     private fun createToolsList(): MutableMap<String, Any> {
         val tools: MutableMap<String, Any> = hashMapOf()
 
-        if (!assistantConfig.search.isNullOrEmpty()) {
-            assistantConfig.search.keys.forEach { name ->
+        if (!assistantConfig.tools.isNullOrEmpty()) {
+            assistantConfig.tools.keys.forEach { name ->
                 if (name == ToolType.GOOGLE_SEARCH.toolName) {
                     ToolType.GOOGLE_SEARCH.createTool(assistantConfig)?.let { tools.put(name, it) }
                 }
@@ -29,16 +30,17 @@ class ToolsFactory(
     ) {
         GOOGLE_SEARCH("google") {
             override fun createTool(config: AssistantConfig): Any? {
-                if (config.search!!.containsKey(toolName)) {
+                if (config.tools != null && config.tools.containsKey(toolName) && config.tools[toolName] is SearchConfig) {
                     try {
+                        val tool = config.tools[toolName]!!
                         val googleSearch =
                             GoogleCustomWebSearchEngine
                                 .builder()
-                                .apiKey(config.search[toolName]!!.apiKey)
-                                .csi(config.search[toolName]!!.csi)
-                                .maxRetries(2)
-                                .logRequests(true)
-                                .logResponses(true)
+                                .apiKey((tool as SearchConfig).apiKey)
+                                .csi(tool.csi)
+                                .maxRetries(tool.retries)
+                                .logRequests(tool.logRequests)
+                                .logResponses(tool.logResponses)
                                 .build()
 
                         return WebSearchTool(googleSearch)
