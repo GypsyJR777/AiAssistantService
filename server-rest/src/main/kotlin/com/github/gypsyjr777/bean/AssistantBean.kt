@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.gypsyjr777.ai.config.AssistantConfig
+import com.github.gypsyjr777.ai.config.Platform
 import com.github.gypsyjr777.ai.exception.ConfigException
 import com.github.gypsyjr777.ai.service.AssistantOllamaService
 import com.github.gypsyjr777.ai.service.AssistantOpenAIService
@@ -40,16 +41,18 @@ class AssistantBean {
         assistantConfig: AssistantConfig,
     ): AssistantOllamaService {
         val assistantOllamaService = AssistantOllamaService()
-        assistantConfig.llm.forEach { name, config ->
-            config.assistants.forEach { assistant ->
-                assistantOllamaService.createAssistant(
-                    assistant + config.modelName,
-                    tools.values.toList(),
-                    config,
-                    Class.forName(assistant),
-                )
+        assistantConfig.llm
+            .filter { it.value.platform == Platform.OLLAMA }
+            .forEach { name, config ->
+                config.assistants.forEach { assistant ->
+                    assistantOllamaService.createAssistant(
+                        assistant + "$" + config.modelName,
+                        tools.values.toList(),
+                        config,
+                        Class.forName(assistant),
+                    )
+                }
             }
-        }
 
         return assistantOllamaService
     }
@@ -62,16 +65,22 @@ class AssistantBean {
     ): AssistantOpenAIService {
         val assistantOpenAIService = AssistantOpenAIService()
 
-        assistantConfig.llm.forEach { name, config ->
-            config.assistants.forEach { assistant ->
-                assistantOpenAIService.createAssistant(
-                    assistant + config.modelName,
-                    tools.values.toList(),
-                    config,
-                    Class.forName(assistant),
-                )
+        assistantConfig.llm
+            .filter {
+                it.value.platform == Platform.LMSTUDIO ||
+                        it.value.platform == Platform.OPENAI ||
+                        it.value.platform == Platform.PREPLEXITY
             }
-        }
+            .forEach { name, config ->
+                config.assistants.forEach { assistant ->
+                    assistantOpenAIService.createAssistant(
+                        assistant + "$" + config.modelName,
+                        tools.values.toList(),
+                        config,
+                        Class.forName(assistant),
+                    )
+                }
+            }
 
         return assistantOpenAIService
     }
