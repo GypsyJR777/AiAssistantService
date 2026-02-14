@@ -1,6 +1,6 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version "2.1.21"
-    id "org.jetbrains.kotlin.plugin.allopen" version "2.1.21"
+    id 'org.jetbrains.kotlin.jvm' version "2.3.10"
+    id "org.jetbrains.kotlin.plugin.allopen" version "2.3.10"
 }
 
 repositories {
@@ -12,7 +12,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
     implementation "dev.langchain4j:langchain4j:${langchain4j_version}"
-    implementation "dev.langchain4j:langchain4j-web-search-engine-google-custom:${langchain4j_version}-beta11"
+    implementation "dev.langchain4j:langchain4j-web-search-engine-google-custom:${langchain4j_version}-beta19"
     implementation "dev.langchain4j:langchain4j-ollama:${langchain4j_version}"
     implementation "dev.langchain4j:langchain4j-http-client-jdk:${langchain4j_version}"
     implementation "dev.langchain4j:langchain4j-open-ai:${langchain4j_version}"

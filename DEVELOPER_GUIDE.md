@@ -2,7 +2,7 @@
 ## Стек
 - kotlin 2.1
 - langchain4j 1.5
-- Quarkus 3.24.3
+- Quarkus 3.31.3
 
 ## AS-IS
 Два модуля:
